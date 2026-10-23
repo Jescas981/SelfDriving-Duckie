@@ -12,7 +12,16 @@ Run commands from this project folder. Python 3.9 or newer is required.
 python -m pip install -r requirements.txt
 ```
 
-Place the dataset episodes in these folders:
+### Download the dataset
+
+Download the [Google Drive dataset folder](https://drive.google.com/drive/folders/1I7ppQGgy25fwcocjKfcAgVkXBppAbgkc) into `data/` using `gdown`:
+
+```bash
+python -m pip install gdown
+gdown --folder "https://drive.google.com/drive/folders/1I7ppQGgy25fwcocjKfcAgVkXBppAbgkc" -O data/
+```
+
+The folder must be accessible to `gdown`. If it contains ZIP archives, extract them into `data/`. Before training, make sure the episodes follow this structure:
 
 ```text
 data/
@@ -87,9 +96,9 @@ Replace the checkpoint path below with your saved `.ckpt` file:
 
 ```bash
 python visualize_checkpoint.py \
-  --checkpoint "logs/self_driving/version_30/checkpoints/epoch=0-step=1263.ckpt" \
-  --episode data/test/test_00000.npz \
-  --window-size 20
+  --checkpoint "checkpoints/last.ckpt" \
+  --episode data/train/train_00000.npz \
+  --window-size 30
 ```
 
 Use the same window size as training and a checkpoint compatible with the current model architecture. The viewer requires a desktop Matplotlib backend.
