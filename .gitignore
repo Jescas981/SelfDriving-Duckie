@@ -1,0 +1,30 @@
+# Local datasets and downloaded archives
+/data/
+*.npz
+*.zip
+
+# Training outputs and model weights
+/logs/
+/lightning_logs/
+*.ckpt
+*.pt
+*.pth
+events.out.tfevents.*
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Local editor settings and environment variables
+.vscode/
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+Thumbs.db

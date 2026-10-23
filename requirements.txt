@@ -1,0 +1,6 @@
+numpy
+matplotlib
+torch
+lightning>=2.0,<3
+tensorboard
+protobuf>=6.31.1,<7
