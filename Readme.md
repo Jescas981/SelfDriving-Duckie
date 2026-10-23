@@ -4,6 +4,10 @@ Train a CNN + attention + LSTM model on Duckietown camera sequences and compare 
 
 ![SelfDriving preview](images/preview.gif)
 
+Attention visualization:
+
+![Model attention visualization](images/att.gif)
+
 ## Setup
 
 Run commands from this project folder. Python 3.9 or newer is required.

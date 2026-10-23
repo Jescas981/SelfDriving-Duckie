@@ -1,11 +1,14 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
+from torchvision.transforms.functional import gaussian_blur
 
 
 class SelfDrivingModel(nn.Module):
-    def __init__(self,lstm_hidden=256, n_actions=1):
+    def __init__(self, lstm_hidden=256, n_actions=1, ret_fmatt=False, ret_attfmaps=None):
         super(SelfDrivingModel, self).__init__()
+        self.ret_fmatt = ret_fmatt if ret_attfmaps is None else ret_attfmaps
+
         self.encoder = nn.Sequential(
             # First block
             nn.Conv2d(in_channels=3, out_channels=24,
@@ -56,8 +59,8 @@ class SelfDrivingModel(nn.Module):
 
     def forward(self, x):
         # Input shape
-        B, T, C, H, W = x.shape
-        x = x.view(B * T, C, H, W)
+        B, T, C, H_in, W_in = x.shape
+        x = x.view(B * T, C, H_in, W_in)
         embeddings = self.encoder(x)
 
         # Embedings shape: (B*T, C, H, W)
@@ -72,6 +75,11 @@ class SelfDrivingModel(nn.Module):
         
         outputs = torch.zeros(B, T, 1, device=x.device)
         attentions = torch.zeros(B, T, L, device=x.device)
+        
+        if self.ret_fmatt:
+            fmatts = torch.zeros(B, T, 1, H_in, W_in, device=x.device)
+        else:
+            fmatts = None
 
         for i in range(T):
             feat_vecs_t = feat_vecs[:, i, :, :] # 32, 200, 64
@@ -82,7 +90,12 @@ class SelfDrivingModel(nn.Module):
             attention_weights = F.softmax(scores, dim=-1) # 32, 1, 200
             attentions[:, i, :] = attention_weights.squeeze(1) # Save
             # Get attention matrix for visualization
-            # att_matrix = attention_weights.view(B, 1, H, W) 
+            if self.ret_fmatt:
+                att_matrix = attention_weights.view(B, 1, H, W) 
+                att_map = F.interpolate(att_matrix, size=(H_in, W_in), mode="bilinear", align_corners=False)
+                att_map = gaussian_blur(att_map, kernel_size=[5, 5], sigma=[1.0, 1.0])
+                fmatts[:, i] = att_map
+
             # Weighted average (context)
             ctx_at = torch.bmm(attention_weights, feat_vecs_t) # 32 x 1 x 200 @ 32, 200, 64 -> 32, 1, 64 # a_i
             beta = torch.sigmoid(self.gate_lin(h_t_tr))
@@ -98,4 +111,6 @@ class SelfDrivingModel(nn.Module):
             out =  self.head(ctxh_cat)
             outputs[:, i, :] = out
 
+        if self.ret_fmatt:
+            return outputs, attentions, fmatts
         return outputs, attentions

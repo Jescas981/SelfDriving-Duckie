@@ -14,14 +14,14 @@ import torch
 from model.model import SelfDrivingModel
 
 
-def load_model(path, device):
+def load_model(path, device, ret_attfmaps=False):
     checkpoint = torch.load(path, map_location='cpu', weights_only=True)
     state = checkpoint.get('state_dict', checkpoint)
     state = {key.removeprefix('model.'): value for key, value in state.items()}
     hidden = state['lstm.weight_hh_l0'].shape[1]
     if state['head.2.weight'].shape[0] != 1:
         raise ValueError('This viewer expects a model with one inverse-radius output.')
-    model = SelfDrivingModel(lstm_hidden=hidden)
+    model = SelfDrivingModel(lstm_hidden=hidden, ret_attfmaps=ret_attfmaps)
     try:
         model.load_state_dict(state, strict=True)
     except RuntimeError as error:
