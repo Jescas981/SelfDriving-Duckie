@@ -117,6 +117,32 @@ To browse the dataset without a model:
 python preview_dataset.py --file data/test/test_00000.npz
 ```
 
+### Read a single episode
+
+Print array shapes, data types, and episode metadata:
+
+```bash
+python read_episode.py data/train/train_00000.npz
+```
+
+Display a frame or save it as an image:
+
+```bash
+python read_episode.py data/train/train_00000.npz --frame 100 --show
+python read_episode.py data/train/train_00000.npz --frame 100 --save frame100.png
+```
+
+The loader is also available in Python:
+
+```python
+from read_episode import load_episode
+
+episode = load_episode("data/train/train_00000.npz")
+images = episode["rgb"]
+actions = episode["action"]
+metadata = episode["metadata"]
+```
+
 ## References
 
 The first reference describes the Duckietown platform; it does not establish the provenance of the specific dataset files in this project. The second is a related paper on visual attention for driving, rather than a claim that this code reproduces its complete method.
