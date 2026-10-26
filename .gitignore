@@ -1,6 +1,6 @@
 # Local datasets and downloaded archives
 /data/
-*.npz
+#*.npz
 *.zip
 
 # Training outputs and model weights
