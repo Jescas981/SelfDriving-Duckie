@@ -5,7 +5,7 @@ from torchvision.transforms.functional import gaussian_blur
 
 
 class SelfDrivingModel(nn.Module):
-    def __init__(self, lstm_hidden=256, n_actions=1, ret_fmatt=False, ret_attfmaps=None):
+    def __init__(self, lstm_hidden=128, n_actions=1, ret_fmatt=False, ret_attfmaps=None):
         super(SelfDrivingModel, self).__init__()
         self.ret_fmatt = ret_fmatt if ret_attfmaps is None else ret_attfmaps
 
@@ -49,6 +49,7 @@ class SelfDrivingModel(nn.Module):
         # Attention
         self.query = nn.Linear(in_features=lstm_hidden, out_features=lstm_hidden)
         self.key = nn.Linear(in_features=64, out_features=lstm_hidden)
+        self.value = nn.Linear(in_features=64, out_features=64)
 
         # Initialize h_t
         self.f_init_c = nn.Linear(64, lstm_hidden)
@@ -86,6 +87,7 @@ class SelfDrivingModel(nn.Module):
             h_t_tr = h_t.transpose(0, 1)
             Q = self.query(h_t_tr) # 32, 1, 128
             K = self.key(feat_vecs_t) # 32, 200, 128
+            V = self.value(feat_vecs_t)
             scores = torch.bmm(Q, K.transpose(1, 2)) / (K.size(-1) ** 0.5)
             attention_weights = F.softmax(scores, dim=-1) # 32, 1, 200
             attentions[:, i, :] = attention_weights.squeeze(1) # Save
@@ -97,7 +99,7 @@ class SelfDrivingModel(nn.Module):
                 fmatts[:, i] = att_map
 
             # Weighted average (context)
-            ctx_at = torch.bmm(attention_weights, feat_vecs_t) # 32 x 1 x 200 @ 32, 200, 64 -> 32, 1, 64 # a_i
+            ctx_at = torch.bmm(attention_weights, V) # 32 x 1 x 200 @ 32, 200, 64 -> 32, 1, 64 # a_i
             beta = torch.sigmoid(self.gate_lin(h_t_tr))
             ctx_gate = beta * ctx_at
             # Update LSTM state

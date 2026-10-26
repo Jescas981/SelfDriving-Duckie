@@ -6,7 +6,7 @@
 # Training outputs and model weights
 /logs/
 /lightning_logs/
-*.ckpt
+#*.ckpt
 *.pt
 *.pth
 events.out.tfevents.*

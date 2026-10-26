@@ -48,7 +48,7 @@ Files also include timestamps, rewards, termination flags, and simulator state. 
 import numpy as np
 import matplotlib.pyplot as plt
 
-with np.load("data/train/train_00000.npz", allow_pickle=False) as episode:
+with np.load("test.npz", allow_pickle=False) as episode:
     images = episode["rgb"]
     actions = episode["action"]
 
@@ -101,7 +101,7 @@ Replace the checkpoint path below with your saved `.ckpt` file:
 ```bash
 python visualize_checkpoint.py \
   --checkpoint "checkpoints/last.ckpt" \
-  --episode data/train/train_00000.npz \
+  --episode test.npz \
   --window-size 30
 ```
 
@@ -115,6 +115,32 @@ To browse the dataset without a model:
 
 ```bash
 python preview_dataset.py --file data/test/test_00000.npz
+```
+
+### Read a single episode
+
+Print array shapes, data types, and episode metadata:
+
+```bash
+python read_episode.py test.npz
+```
+
+Display a frame or save it as an image:
+
+```bash
+python read_episode.py test.npz --frame 100 --show
+python read_episode.py test.npz --frame 100 --save frame100.png
+```
+
+The loader is also available in Python:
+
+```python
+from read_episode import load_episode
+
+episode = load_episode("test.npz")
+images = episode["rgb"]
+actions = episode["action"]
+metadata = episode["metadata"]
 ```
 
 ## References
