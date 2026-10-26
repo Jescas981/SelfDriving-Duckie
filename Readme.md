@@ -16,6 +16,28 @@ Run commands from this project folder. Python 3.9 or newer is required.
 python -m pip install -r requirements.txt
 ```
 
+## Visualize predictions [Run this]
+
+Replace the checkpoint path below with your saved `.ckpt` file:
+
+```bash
+python visualize_checkpoint.py \
+  --checkpoint "checkpoints/last.ckpt" \
+  --episode test.npz \
+  --window-size 30
+
+python visualize_attention.py \
+  --checkpoint "checkpoints/last.ckpt" \
+  --episode test.npz \
+  --window-size 30
+```
+
+Use the same window size as training and a checkpoint compatible with the current model architecture. The viewer requires a desktop Matplotlib backend.
+
+The viewer displays camera frames, model predictions versus recorded targets, absolute error, and episode MAE. Each prediction uses the last frame of a rolling window; the initial frames without a complete window are excluded from MAE.
+
+Controls: **Space** to play/pause, **Left/Right** to step, or drag the frame slider.
+
 ### Download the dataset
 
 Download the [Google Drive dataset folder](https://drive.google.com/drive/folders/1I7ppQGgy25fwcocjKfcAgVkXBppAbgkc) into `data/` using `gdown`:
@@ -94,22 +116,6 @@ tensorboard --logdir logs
 
 TensorBoard shows total, L1, and attention losses for training and validation.
 
-## Visualize predictions
-
-Replace the checkpoint path below with your saved `.ckpt` file:
-
-```bash
-python visualize_checkpoint.py \
-  --checkpoint "checkpoints/last.ckpt" \
-  --episode test.npz \
-  --window-size 30
-```
-
-Use the same window size as training and a checkpoint compatible with the current model architecture. The viewer requires a desktop Matplotlib backend.
-
-The viewer displays camera frames, model predictions versus recorded targets, absolute error, and episode MAE. Each prediction uses the last frame of a rolling window; the initial frames without a complete window are excluded from MAE.
-
-Controls: **Space** to play/pause, **Left/Right** to step, or drag the frame slider.
 
 To browse the dataset without a model:
 
